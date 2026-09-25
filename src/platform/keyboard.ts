@@ -33,12 +33,18 @@ export function initKeyboard(): void {
     return
   }
 
-  // A browser (development, tests): the visual viewport shrinks when a keyboard opens.
+  // The web app (installed or in a tab): the keyboard shrinks the visual viewport, not the page, and
+  // the browser may also pan the visual viewport down to keep the field in view.
   const vv = window.visualViewport
   if (!vv) return
-  let tallest = vv.height
-  vv.addEventListener('resize', () => {
-    tallest = Math.max(tallest, vv.height)
-    setHeight(tallest - vv.height > 120 ? tallest - vv.height : 0)
-  })
+  const update = () => setHeight(keyboardCover(document.documentElement.clientHeight, vv.offsetTop, vv.height))
+  vv.addEventListener('resize', update)
+  vv.addEventListener('scroll', update)
+}
+
+// How much of the bottom of the page the keyboard covers: whatever lies below the visual viewport.
+// Small differences are the browser's own toolbar showing or hiding, not a keyboard.
+export function keyboardCover(layoutHeight: number, viewportTop: number, viewportHeight: number): number {
+  const covered = layoutHeight - (viewportTop + viewportHeight)
+  return covered > 120 ? covered : 0
 }

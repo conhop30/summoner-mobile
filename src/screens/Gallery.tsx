@@ -66,7 +66,8 @@ export default function Gallery() {
 
   async function doExport(list: Champion[]) {
     try {
-      if (await exportChampions(list)) toast(list.length === 1 ? 'Exported.' : `Exported ${list.length} champions.`)
+      const message = await exportChampions(list)
+      if (message) toast(message)
     } catch {
       toast('The export could not be shared.')
     }

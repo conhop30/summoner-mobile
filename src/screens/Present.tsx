@@ -4,7 +4,7 @@ import type { AbilitySlot } from '../interchange/types'
 import { SLOTS } from '../interchange/types'
 import { filledSlots, KIND_LABEL, SLOT_LABEL, SLOT_TYPE } from '../model/champion'
 import { imageUrl } from '../logic/image'
-import { enterImmersive, exitImmersive } from '../platform'
+import { enterImmersive, exitImmersive, onImmersiveExit } from '../platform'
 import { useLibrary } from '../store/library'
 import { CloseIcon } from '../ui/icons'
 import './Present.css'
@@ -28,8 +28,10 @@ export default function Present() {
 
   useEffect(() => {
     void enterImmersive()
-    return () => { void exitImmersive() }
-  }, [])
+    // Leaving fullscreen with Back or the edge swipe (web) leaves Present too.
+    const stop = onImmersiveExit(() => navigate(-1))
+    return () => { stop(); void exitImmersive() }
+  }, [navigate])
 
   const showOverlay = useCallback(() => {
     setOverlay(true)

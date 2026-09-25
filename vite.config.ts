@@ -1,10 +1,42 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
-// The app is a plain web app; Capacitor wraps the built `dist` folder in an Android shell.
+// The app is a plain web app, installed from a page as a PWA. (Capacitor can still wrap the same
+// built `dist` folder in an Android shell.)
 export default defineConfig({
-  plugins: [react()],
-  // Relative asset paths: the WebView serves the app from its own origin, not from a site root.
+  plugins: [
+    react(),
+    VitePWA({
+      // The app registers the worker itself (src/platform/pwa.ts), so the Android shell can skip it.
+      injectRegister: false,
+      // A new version is fetched in the background and takes over the next time the app is opened,
+      // never in the middle of an edit.
+      registerType: 'prompt',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
+        navigateFallback: 'index.html',
+      },
+      manifest: {
+        name: 'Summoner Mobile',
+        short_name: 'Summoner',
+        description: "Design a champion's concept on your phone: story, identity and abilities.",
+        // Relative, so it works from a site root or a project subfolder (GitHub Pages).
+        start_url: './',
+        scope: './',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#010a13',
+        theme_color: '#010a13',
+        icons: [
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+    }),
+  ],
+  // Relative asset paths: the app is served from a subfolder on GitHub Pages and from its own origin in the Android WebView.
   base: './',
   build: { outDir: 'dist', sourcemap: false },
   test: {

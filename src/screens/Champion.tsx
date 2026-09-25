@@ -108,7 +108,7 @@ export default function ChampionScreen() {
         items={[
           {
             key: 'export', label: 'Export this champion', icon: <ShareIcon />,
-            onSelect: () => { exportChampions([champion]).then(ok => ok && toast('Exported.')).catch(() => toast('The export could not be shared.')) },
+            onSelect: () => { exportChampions([champion]).then(message => message && toast(message)).catch(() => toast('The export could not be shared.')) },
           },
           { key: 'delete', label: 'Delete', icon: <TrashIcon />, danger: true, onSelect: () => setDeleting(true) },
         ]}

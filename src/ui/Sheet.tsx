@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { pushBackHandler } from '../platform/backStack'
 import { CloseIcon } from './icons'
@@ -24,8 +24,12 @@ export function usePresence(open: boolean, exitMs = EXIT_MS): { mounted: boolean
 }
 
 // Android Back closes the top-most thing first: register while open.
+// Registered once per opening; a parent re-render that hands over a new onClose must not re-register
+// (that would move this sheet to the top of the stack and, on the web, churn the history entries).
 export function useBackClose(open: boolean, onClose: () => void): void {
-  useEffect(() => (open ? pushBackHandler(onClose) : undefined), [open, onClose])
+  const latest = useRef(onClose)
+  latest.current = onClose
+  useEffect(() => (open ? pushBackHandler(() => latest.current()) : undefined), [open])
 }
 
 interface SheetProps {

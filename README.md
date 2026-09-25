@@ -1,10 +1,18 @@
 # Summoner Mobile
 
-A compact Android companion to [Summoner](https://github.com/conhop30/summoner): design a champion's concept (story, identity, abilities and their parts, plus notes) on your phone, and move champions to and from the desktop app as JSON.
+A compact phone companion to [Summoner](https://github.com/conhop30/summoner): design a champion's concept (story, identity, abilities and their parts, plus notes) on your phone, and move champions to and from the desktop app as JSON.
 
 It is about the *idea* of a champion. Numbers, items and builds stay in Summoner on your computer, and importing on either side updates what it recognises and never overwrites the other side's data.
 
-Status: first slice built and verified on an Android emulator. Not released yet.
+It is a web app you install from its page, like any installed web app. There is no account, no server, and no store listing: champions live on your device, the app makes no network requests of its own, and once installed it opens with no connection.
+
+Status: first slice built and verified in Chrome on an Android emulator (install, offline, Back, keyboard, fullscreen Present, export, photo picker). Not published yet.
+
+## Installing
+
+Open the app's page in Chrome on Android and choose **⋮ → Install app** (or **Add to Home screen**). On iPhone, open it in Safari and choose **Share → Add to Home Screen**. The About sheet in the app repeats this and offers a one-tap install button where the browser allows it.
+
+Updates arrive by themselves: the app checks its own page when you open it, and the new version takes over the next time you launch it, never in the middle of an edit. Your champions are not touched by an update.
 
 ## What is in it
 
@@ -14,7 +22,7 @@ Status: first slice built and verified on an Android emulator. Not released yet.
 - **Abilities**: Passive, Q, W, E, R, each with an icon, name and description, plus **parts** (extra passives, alternate forms like Gnar's and Jayce's, recasts).
 - **Journal**: per-ability notes, from the floating hex widget (a menu that will grow).
 - **Present**: a full-screen, chrome-free showcase you swipe through (Cover, Lore, Abilities).
-- **Import / export** of the format in `contract/SPEC.md`, through the Android share sheet and file picker.
+- **Import / export** of the format in `contract/SPEC.md`. Export opens the share sheet where the browser allows it; Chrome on Android refuses to share `.json` files, so there it saves the file to Downloads and you share it from Files or Drive.
 
 Design notes are in `docs/UX.md`.
 
@@ -27,13 +35,29 @@ Design notes are in `docs/UX.md`.
 ```
 npm install
 npm run dev            # the web build in a browser (use the browser's phone view)
-npm test               # unit tests: model, storage, import/export, image helpers, contract fixtures
-npm run build          # typecheck + production build into dist/
+npm test               # unit tests: model, storage, import/export, back-button history, image helpers, contract fixtures
+npm run build          # typecheck + production build into dist/ (includes the offline worker)
+npm run preview        # serve the production build; the offline worker only runs on this, not in dev
 ```
 
-### Android
+To try it on a phone or emulator, serve the build and reach it as `localhost` (a secure context, which installing and the offline worker require): `npm run preview -- --host 127.0.0.1`, then `adb reverse tcp:4173 tcp:4173` and open `http://localhost:4173` in Chrome on the device.
 
-The app is a Capacitor shell around the web build. You need JDK 21 and the Android SDK (`ANDROID_HOME`). Gradle 8 does not run on JDK 25, so if your `JAVA_HOME` points at a newer JDK (Android Studio's bundled one may), point it at 21 for the build:
+### Publishing
+
+`.github/workflows/pages.yml` builds and publishes `dist/` to GitHub Pages on every push to `main`, after the tests pass. It needs no secrets or keys; enable Pages for the repository (Settings → Pages → Source: GitHub Actions). The app uses relative paths and a hash router, so it works from the repository's subfolder URL.
+
+### How the web build differs from a native app
+
+`src/platform/` holds everything that differs by environment:
+
+- **Back button.** Installed web apps have no back-button event, only browser history. `webHistory.ts` gives each open sheet or menu a history entry, so Back closes it before leaving the screen.
+- **Keyboard.** The keyboard covers the page rather than resizing it; `keyboard.ts` measures the covered part and lifts sheets above it.
+- **Present.** Uses the browser's fullscreen and screen wake lock; leaving fullscreen leaves Present.
+- **Storage.** IndexedDB, and the app asks the browser to keep it (`navigator.storage.persist`).
+
+### Optional: an Android shell
+
+The same build can be wrapped as a native APK with Capacitor. This is not how the app is meant to be installed (Android only installs signed APKs, which means keeping a key), but it is kept working for anyone who wants it. You need JDK 21 and the Android SDK (`ANDROID_HOME`). Gradle 8 does not run on JDK 25, so if your `JAVA_HOME` points at a newer JDK (Android Studio's bundled one may), point it at 21 for the build:
 
 ```
 npm run android:sync                               # build the web app and copy it into android/
@@ -47,4 +71,4 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ## Where champions are stored
 
-In the app's own storage on the phone (IndexedDB). Uninstalling the app or clearing its data deletes them, so the app shows when you last exported and nudges you to export after heavy editing.
+On your device, in the browser's storage for this app (IndexedDB). Uninstalling the app or clearing its site data deletes them, so the app shows when you last exported and nudges you to export after heavy editing. The About sheet says so if the browser has not agreed to keep the data when space runs low.

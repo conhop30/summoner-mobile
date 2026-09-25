@@ -1,5 +1,7 @@
 import Sheet from '../ui/Sheet'
 import { APP_VERSION } from '../logic/transfer'
+import { isNative } from '../platform'
+import { detectPlatform, promptInstall, usePwa } from '../platform/pwa'
 import { useLibrary } from '../store/library'
 import { useSettings } from '../store/settings'
 
@@ -13,6 +15,8 @@ export default function AboutSheet({ open, onClose }: { open: boolean; onClose: 
   const lastExportedAt = useLibrary(s => s.lastExportedAt)
   const navStyle = useSettings(s => s.navStyle)
   const set = useSettings(s => s.set)
+  const { canInstall, installed, persisted } = usePwa()
+  const ios = detectPlatform() === 'ios'
 
   return (
     <Sheet open={open} onClose={onClose} title="About">
@@ -33,10 +37,24 @@ export default function AboutSheet({ open, onClose }: { open: boolean; onClose: 
       <div>
         <div className="field-label">Your data</div>
         <p className="sheet-message">
-          Champions are stored on this phone only. Uninstalling the app or clearing its data deletes them, so export now
-          and then. Last exported: {when(lastExportedAt)}.
+          Champions are stored on this device only, never sent anywhere. Uninstalling the app or clearing its site data
+          deletes them, so export now and then. Last exported: {when(lastExportedAt)}.
+          {persisted === false && ' Your browser has not promised to keep this data if space runs low, so exporting matters more.'}
         </p>
       </div>
+
+      {!isNative() && !installed && (
+        <div>
+          <div className="field-label">Install</div>
+          <p className="sheet-message">
+            Installing puts Summoner on your home screen and lets it open with no connection.
+            {!canInstall && (ios
+              ? ' In Safari, tap Share, then Add to Home Screen.'
+              : ' Use your browser\'s menu, then Install app or Add to Home screen.')}
+          </p>
+          {canInstall && <button className="btn primary" onClick={() => void promptInstall()}>Install app</button>}
+        </div>
+      )}
 
       <div>
         <div className="field-label">Experimental: navigation</div>

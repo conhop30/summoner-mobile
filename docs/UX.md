@@ -1,6 +1,6 @@
 # Summoner Mobile: UX
 
-Status: **v3, decisions settled, build starting.** Summoner Mobile is about the *idea* of a champion: who they are, what they look like, what their abilities are called and what they do, including the multi-part abilities (Gnar, Jayce). No numbers, no items, no audio. The desktop keeps all of that, and the phone leaves it alone.
+Status: **v3, first slice built. Ships as an installable web app (PWA); see the README.** Summoner Mobile is about the *idea* of a champion: who they are, what they look like, what their abilities are called and what they do, including the multi-part abilities (Gnar, Jayce). No numbers, no items, no audio. The desktop keeps all of that, and the phone leaves it alone.
 
 The rule for the design: **few screens, short screens, no clutter.** Where something can't be short, it opens in a sheet.
 
