@@ -2,12 +2,13 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// The app is a plain web app, installed from its page as a PWA.
+// The app is a plain web app, installed from a page as a PWA. (Capacitor can still wrap the same
+// built `dist` folder in an Android shell.)
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // The app registers the worker itself (src/platform/pwa.ts), and only in the production build.
+      // The app registers the worker itself (src/platform/pwa.ts), so the Android shell can skip it.
       injectRegister: false,
       // A new version is fetched in the background and takes over the next time the app is opened,
       // never in the middle of an edit.
@@ -35,7 +36,7 @@ export default defineConfig({
       },
     }),
   ],
-  // Relative asset paths: the app is served from a subfolder on GitHub Pages, not from a site root.
+  // Relative asset paths: the app is served from a subfolder on GitHub Pages and from its own origin in the Android WebView.
   base: './',
   build: { outDir: 'dist', sourcemap: false },
   test: {

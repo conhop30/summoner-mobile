@@ -6,7 +6,7 @@ It is about the *idea* of a champion. Numbers, items and builds stay in Summoner
 
 It is a web app you install from its page, like any installed web app. There is no account, no server, and no store listing: champions live on your device, the app makes no network requests of its own, and once installed it opens with no connection.
 
-Status: first slice built and verified in Chrome on an Android emulator (install, offline, Back, keyboard, fullscreen Present, export, photo picker).
+Status: first slice built and verified in Chrome on an Android emulator (install, offline, Back, keyboard, fullscreen Present, export, photo picker). Not published yet.
 
 ## Installing
 
@@ -46,7 +46,7 @@ To try it on a phone or emulator, serve the build and reach it as `localhost` (a
 
 `.github/workflows/pages.yml` builds and publishes `dist/` to GitHub Pages on every push to `main`, after the tests pass. It needs no secrets or keys; enable Pages for the repository (Settings → Pages → Source: GitHub Actions). The app uses relative paths and a hash router, so it works from the repository's subfolder URL.
 
-### What is browser-specific
+### How the web build differs from a native app
 
 `src/platform/` holds everything that differs by environment:
 
@@ -54,6 +54,20 @@ To try it on a phone or emulator, serve the build and reach it as `localhost` (a
 - **Keyboard.** The keyboard covers the page rather than resizing it; `keyboard.ts` measures the covered part and lifts sheets above it.
 - **Present.** Uses the browser's fullscreen and screen wake lock; leaving fullscreen leaves Present.
 - **Storage.** IndexedDB, and the app asks the browser to keep it (`navigator.storage.persist`).
+
+### Optional: an Android shell
+
+The same build can be wrapped as a native APK with Capacitor. This is not how the app is meant to be installed (Android only installs signed APKs, which means keeping a key), but it is kept working for anyone who wants it. You need JDK 21 and the Android SDK (`ANDROID_HOME`). Gradle 8 does not run on JDK 25, so if your `JAVA_HOME` points at a newer JDK (Android Studio's bundled one may), point it at 21 for the build:
+
+```
+npm run android:sync                               # build the web app and copy it into android/
+cd android
+JAVA_HOME="<path to JDK 21>" ./gradlew assembleDebug
+# APK: android/app/build/outputs/apk/debug/app-debug.apk
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+`android/app/src/main/java/.../ImmersivePlugin.java` is the one piece of native code: it hides the system bars and keeps the screen awake during Present.
 
 ## Where champions are stored
 

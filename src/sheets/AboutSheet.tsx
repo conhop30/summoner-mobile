@@ -1,5 +1,6 @@
 import Sheet from '../ui/Sheet'
 import { APP_VERSION } from '../logic/transfer'
+import { isNative } from '../platform'
 import { detectPlatform, promptInstall, usePwa } from '../platform/pwa'
 import { useLibrary } from '../store/library'
 import { useSettings } from '../store/settings'
@@ -42,7 +43,7 @@ export default function AboutSheet({ open, onClose }: { open: boolean; onClose: 
         </p>
       </div>
 
-      {!installed && (
+      {!isNative() && !installed && (
         <div>
           <div className="field-label">Install</div>
           <p className="sheet-message">
