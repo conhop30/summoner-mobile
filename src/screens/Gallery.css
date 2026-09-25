@@ -1,0 +1,50 @@
+.brand { flex: 1; display: flex; align-items: center; gap: var(--space-2); color: var(--text-primary); font-size: var(--font-size-sm); letter-spacing: var(--tracking-widest); text-transform: uppercase; }
+.brand svg { color: var(--accent-gold); }
+
+.search-input {
+  flex: 1;
+  min-height: var(--touch-min);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-focus);
+  color: var(--text-bright);
+  outline: none;
+  margin-right: var(--space-2);
+}
+
+
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+
+.tile { display: flex; flex-direction: column; text-align: left; background: var(--bg-surface); border: 1px solid var(--border-default); touch-action: manipulation; }
+.tile:active { border-color: var(--accent-gold); }
+.tile-image { position: relative; width: 100%; aspect-ratio: 0.72; background: var(--bg-elevated); overflow: hidden; }
+.tile-image img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.tile-blank { width: 100%; height: 100%; display: grid; place-items: center; color: var(--border-strong); }
+.tile-info { padding: var(--space-2) var(--space-3) var(--space-3); min-height: 62px; }
+.tile-name { color: var(--text-bright); font-size: var(--font-size-md); font-weight: 500; letter-spacing: var(--tracking-normal); line-height: 1.25; }
+.tile-title { color: var(--text-muted); font-size: var(--font-size-xs); }
+.tile-tags { margin-top: 2px; color: var(--tag-gold-text); font-size: var(--font-size-xs); letter-spacing: var(--tracking-normal); }
+
+.fab {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(var(--space-4) + var(--safe-bottom));
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  background: var(--accent-gold);
+  color: var(--text-inverse);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.fab:active { background: var(--accent-gold-hover); }
+
+.empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-10) var(--space-4); color: var(--text-secondary); text-align: center; }
+.empty svg { color: var(--border-strong); }
+.empty .btn { width: 100%; max-width: 320px; }
+
+.reminder { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); margin-bottom: var(--space-3); background: var(--accent-gold-dim); border: 1px solid var(--tag-gold-border); font-size: var(--font-size-sm); color: var(--text-secondary); }
+.reminder span { flex: 1; }
+.icon-btn.small { width: 36px; height: 36px; }
+.center { text-align: center; padding: var(--space-8) 0; }

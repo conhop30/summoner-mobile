@@ -1,0 +1,44 @@
+/* Inputs, chips and labels shared by every screen. */
+
+.field {
+  width: 100%;
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: 0;
+  color: var(--text-bright);
+  outline: none;
+  line-height: 1.45;
+}
+.field::placeholder { color: var(--text-placeholder); }
+.field:focus { border-color: var(--border-focus); }
+.field-area { resize: none; overflow: hidden; min-height: 96px; display: block; }
+
+.field-label {
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+.chip {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  letter-spacing: var(--tracking-normal);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.chip.on { border-color: var(--accent-gold); color: var(--text-accent-gold); background: var(--accent-gold-dim); }
+.chip:active { border-color: var(--accent-gold); }
+
+.sheet-message { color: var(--text-secondary); line-height: 1.55; }
+.muted { color: var(--text-muted); font-size: var(--font-size-sm); }

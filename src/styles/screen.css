@@ -1,0 +1,14 @@
+/* Screen scaffolding shared by every screen: a fixed app bar over one scrolling area. */
+.screen { position: fixed; inset: 0; bottom: var(--kb, 0px); display: flex; flex-direction: column; background: var(--bg-base); }
+
+.appbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: calc(var(--appbar-height) + var(--safe-top));
+  padding: var(--safe-top) var(--space-2) 0 var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  flex-shrink: 0;
+}
+.scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-4) var(--space-4) calc(96px + var(--safe-bottom)); }

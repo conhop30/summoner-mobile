@@ -1,0 +1,25 @@
+.import-file { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); }
+.import-file-name { color: var(--text-bright); word-break: break-all; }
+.import-file-scope { flex-shrink: 0; font-size: var(--font-size-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--text-muted); }
+
+.import-list { list-style: none; border-top: 1px solid var(--border-subtle); max-height: 34vh; overflow-y: auto; }
+.import-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--border-subtle); }
+.import-name { flex: 1; min-width: 120px; color: var(--text-body); }
+.import-dates { flex-basis: 100%; font-size: var(--font-size-xs); color: var(--text-muted); }
+
+.import-chip { font-size: var(--font-size-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; padding: 1px var(--space-2); border: 1px solid var(--border-default); color: var(--text-secondary); }
+.import-chip-new { color: var(--text-accent-gold); border-color: var(--tag-gold-border); }
+.import-chip-update { color: var(--text-accent-hex); border-color: var(--accent-hex-deep); }
+.import-chip-local-newer { color: var(--text-bright); border-color: var(--border-strong); }
+
+.import-choice { border: 1px solid var(--border-default); padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
+.import-choice legend { padding: 0 var(--space-2); color: var(--text-body); }
+.import-option { display: flex; align-items: flex-start; gap: var(--space-3); min-height: var(--touch-min); color: var(--text-secondary); }
+.import-option input { accent-color: var(--accent-gold); width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; }
+.import-option.on .import-option-label { color: var(--text-accent-gold); }
+.import-option-label { display: block; font-size: var(--font-size-md); }
+.import-option-hint { display: block; font-size: var(--font-size-xs); color: var(--text-muted); }
+
+.import-warnings { font-size: var(--font-size-sm); color: var(--text-muted); }
+.import-warnings summary { cursor: pointer; min-height: 32px; }
+.import-warnings ul { margin: var(--space-2) 0 0 var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); }

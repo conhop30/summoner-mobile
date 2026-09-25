@@ -1,0 +1,14 @@
+.btn.compact { min-height: 36px; padding: 0 var(--space-4); }
+
+.reposition-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  background: var(--bg-elevated);
+  overflow: hidden;
+  touch-action: none;
+  border: 1px solid var(--border-default);
+}
+.reposition-box img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; user-select: none; }
+/* Everything outside the frame is dimmed by the frame's own shadow. */
+.reposition-frame { position: absolute; border: 2px solid var(--accent-gold); box-shadow: 0 0 0 999px rgba(1, 10, 19, 0.6); pointer-events: none; }
