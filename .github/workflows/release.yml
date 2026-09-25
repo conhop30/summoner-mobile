@@ -1,0 +1,77 @@
+# Builds the Android app (a signed APK) and, for a version tag, attaches it to a GitHub release.
+#
+#   git tag v0.1.0 && git push origin v0.1.0     → builds and publishes the release
+#   Actions → Build Android app → Run workflow    → builds only; the APK is a downloadable artifact
+#
+# The APK is always attached under the same name, SummonerMobile.apk, so this link never changes:
+#   https://github.com/conhop30/summoner-mobile/releases/latest/download/SummonerMobile.apk
+#
+# Signing uses the project's fixed public key (android/public-signing.keystore, see
+# android/app/build.gradle), so there are no secrets and every release updates the last one.
+name: Build Android app
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Work out the version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          IFS=. read MAJOR MINOR PATCH <<< "$VERSION"
+          echo "name=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "code=$((MAJOR * 10000 + MINOR * 100 + PATCH))" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $VERSION" >&2
+            exit 1
+          fi
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx cap sync android   # copies the built web app (dist/) into the Android project
+
+      - name: Build the APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease \
+            -PappVersionName=${{ steps.version.outputs.name }} \
+            -PappVersionCode=${{ steps.version.outputs.code }}
+
+      - name: Name the APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk SummonerMobile.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SummonerMobile-${{ steps.version.outputs.name }}
+          path: SummonerMobile.apk
+
+      - name: Publish the release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" SummonerMobile.apk \
+            --title "Summoner Mobile ${{ steps.version.outputs.name }}" \
+            --generate-notes

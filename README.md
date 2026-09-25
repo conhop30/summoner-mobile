@@ -4,15 +4,19 @@ A compact phone companion to [Summoner](https://github.com/conhop30/summoner): d
 
 It is about the *idea* of a champion. Numbers, items and builds stay in Summoner on your computer, and importing on either side updates what it recognises and never overwrites the other side's data.
 
-It is a web app you install from its page, like any installed web app. There is no account, no server, and no store listing: champions live on your device, the app makes no network requests of its own, and once installed it opens with no connection.
+There is no account, no server and no store listing. Champions live on your device, the app makes no network requests of its own, and it works with no connection.
 
-Status: first slice built and verified in Chrome on an Android emulator (install, offline, Back, keyboard, fullscreen Present, export, photo picker). Not published yet.
+Status: first slice built and verified on an Android emulator (install, update in place, Back, keyboard, immersive Present, share sheet, photo picker).
 
-## Installing
+## Get it
 
-Open the app's page in Chrome on Android and choose **⋮ → Install app** (or **Add to Home screen**). On iPhone, open it in Safari and choose **Share → Add to Home Screen**. The About sheet in the app repeats this and offers a one-tap install button where the browser allows it.
+**Android app (recommended):** [download SummonerMobile.apk](https://github.com/conhop30/summoner-mobile/releases/latest/download/SummonerMobile.apk) and open it. Android will ask you to allow installing from your browser or Files app, and Play Protect may warn that the app is from an unknown developer; both are expected for an app that isn't in the Play Store. The link always points at the newest release, and installing a newer one over an older one keeps your champions.
 
-Updates arrive by themselves: the app checks its own page when you open it, and the new version takes over the next time you launch it, never in the middle of an edit. Your champions are not touched by an update.
+**Or use it as a web app:** open **https://conhop30.github.io/summoner-mobile/** in Chrome and choose **⋮ → Install app**, or in Safari on iPhone **Share → Add to Home Screen**. It works offline once opened, and new versions take over on the next launch. The Android app and the web app store champions separately; move champions between them, or to the desktop, with export and import.
+
+### About the signing key
+
+Android only installs signed apps and only lets an update replace an app signed with the *same* key. To keep every release an upgrade of the last without anyone guarding a secret, this project signs with one fixed **public** key (`android/public-signing.keystore`, password `android`). It is an identity for updates, not a secret: anyone can build an app signed with it, so install Summoner Mobile only from this repository's releases. Nothing else about the app depends on it.
 
 ## What is in it
 
@@ -22,7 +26,7 @@ Updates arrive by themselves: the app checks its own page when you open it, and 
 - **Abilities**: Passive, Q, W, E, R, each with an icon, name and description, plus **parts** (extra passives, alternate forms like Gnar's and Jayce's, recasts).
 - **Journal**: per-ability notes, from the floating hex widget (a menu that will grow).
 - **Present**: a full-screen, chrome-free showcase you swipe through (Cover, Lore, Abilities).
-- **Import / export** of the format in `contract/SPEC.md`. Export opens the share sheet where the browser allows it; Chrome on Android refuses to share `.json` files, so there it saves the file to Downloads and you share it from Files or Drive.
+- **Import / export** of the format in `contract/SPEC.md`, through the Android share sheet and file picker. (In a browser, Chrome on Android refuses to share `.json` files, so the web app saves the file to Downloads instead.)
 
 Design notes are in `docs/UX.md`.
 
@@ -40,35 +44,43 @@ npm run build          # typecheck + production build into dist/ (includes the o
 npm run preview        # serve the production build; the offline worker only runs on this, not in dev
 ```
 
-To try it on a phone or emulator, serve the build and reach it as `localhost` (a secure context, which installing and the offline worker require): `npm run preview -- --host 127.0.0.1`, then `adb reverse tcp:4173 tcp:4173` and open `http://localhost:4173` in Chrome on the device.
+To try the web app on a phone or emulator, serve the build and reach it as `localhost` (a secure context, which installing and the offline worker require): `npm run preview -- --host 127.0.0.1`, then `adb reverse tcp:4173 tcp:4173` and open `http://localhost:4173` in Chrome on the device.
 
-### Publishing
+### Building the Android app
 
-`.github/workflows/pages.yml` builds and publishes `dist/` to GitHub Pages on every push to `main`, after the tests pass. It needs no secrets or keys; enable Pages for the repository (Settings → Pages → Source: GitHub Actions). The app uses relative paths and a hash router, so it works from the repository's subfolder URL.
-
-### How the web build differs from a native app
-
-`src/platform/` holds everything that differs by environment:
-
-- **Back button.** Installed web apps have no back-button event, only browser history. `webHistory.ts` gives each open sheet or menu a history entry, so Back closes it before leaving the screen.
-- **Keyboard.** The keyboard covers the page rather than resizing it; `keyboard.ts` measures the covered part and lifts sheets above it.
-- **Present.** Uses the browser's fullscreen and screen wake lock; leaving fullscreen leaves Present.
-- **Storage.** IndexedDB, and the app asks the browser to keep it (`navigator.storage.persist`).
-
-### Optional: an Android shell
-
-The same build can be wrapped as a native APK with Capacitor. This is not how the app is meant to be installed (Android only installs signed APKs, which means keeping a key), but it is kept working for anyone who wants it. You need JDK 21 and the Android SDK (`ANDROID_HOME`). Gradle 8 does not run on JDK 25, so if your `JAVA_HOME` points at a newer JDK (Android Studio's bundled one may), point it at 21 for the build:
+The app is a Capacitor shell around the web build. You need JDK 21 and the Android SDK (`ANDROID_HOME`). Gradle 8 does not run on JDK 25, so if your `JAVA_HOME` points at a newer JDK (Android Studio's bundled one may), point it at 21 for the build:
 
 ```
 npm run android:sync                               # build the web app and copy it into android/
 cd android
-JAVA_HOME="<path to JDK 21>" ./gradlew assembleDebug
-# APK: android/app/build/outputs/apk/debug/app-debug.apk
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+JAVA_HOME="<path to JDK 21>" ./gradlew assembleRelease
+# APK: android/app/build/outputs/apk/release/app-release.apk
+adb install -r app/build/outputs/apk/release/app-release.apk
 ```
 
 `android/app/src/main/java/.../ImmersivePlugin.java` is the one piece of native code: it hides the system bars and keeps the screen awake during Present.
 
+### Releasing
+
+Bump `version` in `package.json`, commit, then tag and push:
+
+```
+git tag v0.1.1 && git push origin v0.1.1
+```
+
+`.github/workflows/release.yml` runs the tests, builds the signed APK, and attaches it to a GitHub release as `SummonerMobile.apk` (the tag must match `package.json`). The Android version code is derived from the version (`major*10000 + minor*100 + patch`), so it rises with every release. The same workflow can be run by hand from the Actions tab to build an APK without publishing.
+
+`.github/workflows/pages.yml` publishes the web app to GitHub Pages on every push to `main`, after the tests pass. Neither workflow needs a secret.
+
+### What is browser-specific
+
+`src/platform/` holds everything that differs between the Android app and the web app:
+
+- **Back button.** The Android app gets the hardware Back event. The web app has only browser history, so `webHistory.ts` gives each open sheet or menu a history entry, and Back closes it before leaving the screen.
+- **Keyboard.** The app measures how much of the page the keyboard covers and lifts sheets above it (`keyboard.ts`).
+- **Present.** The Android app hides the system bars natively; the web app uses the browser's fullscreen and wake lock. Leaving fullscreen leaves Present.
+- **Share.** The Android app opens the system share sheet; the web app tries the browser's and falls back to a download.
+
 ## Where champions are stored
 
-On your device, in the browser's storage for this app (IndexedDB). Uninstalling the app or clearing its site data deletes them, so the app shows when you last exported and nudges you to export after heavy editing. The About sheet says so if the browser has not agreed to keep the data when space runs low.
+On your device, in the app's own storage (IndexedDB). Uninstalling the app or clearing its data deletes them, so the app shows when you last exported and nudges you to export after heavy editing.

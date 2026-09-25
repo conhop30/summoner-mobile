@@ -7,8 +7,9 @@ android {
         applicationId "com.conhop30.summonermobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Set by the release workflow from package.json; a local build gets 1 / 0.0.0-dev.
+        versionCode = Integer.parseInt((project.findProperty('appVersionCode') ?: '1').toString())
+        versionName = (project.findProperty('appVersionName') ?: '0.0.0-dev').toString()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +17,25 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Android only installs signed apps, and only lets an update replace an app signed with the same
+    // key. This project uses one fixed, PUBLIC key (password "android") so that every build, on any
+    // machine, is an upgrade of the last and nothing has to be guarded or backed up. It is an identity
+    // for updates, not a secret: anyone can build an app signed with it, so install Summoner Mobile
+    // only from this project's releases.
+    signingConfigs {
+        shared {
+            storeFile file('../public-signing.keystore')
+            storePassword 'android'
+            keyAlias 'summoner'
+            keyPassword 'android'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.shared
+        }
         release {
+            signingConfig signingConfigs.shared
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -16,7 +16,9 @@ android/local.properties
 android/.idea
 *.iml
 
-# Signing material never goes in the repo
+# Private signing material never goes in the repo. The one exception is the project's deliberately
+# public shared key (see android/app/build.gradle).
 *.jks
 *.keystore
+!android/public-signing.keystore
 keystore.properties
