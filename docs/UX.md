@@ -1,6 +1,6 @@
-# Summoner Mobile: UX sketch
+# Summoner Mobile: UX
 
-Status: **draft v2 for review, nothing built.** Summoner Mobile is about the *idea* of a champion: who they are, what they look like, what their abilities are called and what they do. No numbers, no items, no audio. The desktop keeps all of that, and the phone leaves it alone.
+Status: **v3, decisions settled, build starting.** Summoner Mobile is about the *idea* of a champion: who they are, what they look like, what their abilities are called and what they do, including the multi-part abilities (Gnar, Jayce). No numbers, no items, no audio. The desktop keeps all of that, and the phone leaves it alone.
 
 The rule for the design: **few screens, short screens, no clutter.** Where something can't be short, it opens in a sheet.
 
@@ -8,34 +8,33 @@ The rule for the design: **few screens, short screens, no clutter.** Where somet
 
 - Portrait phone first (360-412 dp wide). One dark theme, the desktop's navy, gold and hextech blue. No light mode.
 - Touch targets at least 44 dp. Nothing below 12 sp. Autosave everything; there is no Save button.
-- Bottom sheets for small pickers, full-screen sheets for the few things that need room (splash repositioning). Android Back closes the top sheet first, then goes up one level.
+- Bottom sheets for small pickers, full-screen sheets for the few things that need room (splash repositioning, journal). Android Back closes the top sheet first, then goes up one level.
 - Motion is short CSS transitions. No animation library.
-- **Navigation is swappable.** The three-way navigation (Story / Identity / Abilities) is one component fed by one list of destinations, with two renderers: a **bottom bar** (the first attempt) and a **hamburger drawer**. Switching is a one-line change, so trying the drawer costs nothing.
+- **Navigation is swappable.** Story / Identity / Abilities is one component fed by one list of destinations, with two renderers: a **bottom bar** (first attempt) and a **hamburger drawer**. Switching is a one-line change.
 
 ## Map
 
 ```
 Gallery ──tap──▶ Champion ──▶ Present  (chrome-free showcase)
-   │                └─ Story · Identity · Abilities
+   │                └─ Story · Identity · Abilities      + floating widget (Journal, ...)
    ├─ + New champion (sheet: name)
    └─ ⋮ Import · Export all · About
 ```
-
-Two levels deep at most.
 
 ## What lives on the phone
 
 | | on the phone |
 |---|---|
-| Name, title | yes |
-| Lore, splash art (framed by drag) | yes |
+| Name, title, lore, splash art (framed by drag) | yes |
 | Class, lane, attack type, resource, playstyle, tags | yes |
 | Each ability (Passive, Q, W, E, R): **icon, name, description** | yes |
-| Cooldown, cost, ranks, effects, ratios | no |
-| Ability blocks, ability journal | no (kept safe on the desktop, invisible here) |
+| **Parts** of an ability (extra passive, alternate form, recast): kind, name, description, recast condition | yes |
+| **Ability journal** notes | yes, via the floating widget |
+| Cooldown, cost, ranks, effects, ratios, part numbers | no |
 | Base stats, items, builds | no |
 | Theme audio, light/dark, Data Dragon sync, updater | no |
-| Poster image, JSON import and export | yes |
+| JSON import and export | yes |
+| Poster image | not in the first slice |
 
 Anything the phone doesn't show is preserved untouched when the champion goes back to the desktop (see `contract/SPEC.md`).
 
@@ -47,7 +46,6 @@ Anything the phone doesn't show is preserved untouched when the champion goes ba
 ├──────────────────────────┤
 │ ┌────────┐  ┌────────┐   │
 │ │ splash │  │ splash │   │   2-column tiles, same crop as the desktop tile
-│ │        │  │        │   │   (the gallery focal point applies)
 │ │ Ahri   │  │ Zed    │   │
 │ │ Mage   │  │ Assas. │   │
 │ └────────┘  └────────┘   │
@@ -56,30 +54,35 @@ Anything the phone doesn't show is preserved untouched when the champion goes ba
 ```
 
 - 🔍 opens an inline name filter, not a screen.
-- Long-press a tile: Open · Present · Export this champion · Download poster · Delete (confirms).
+- Long-press a tile: Open · Present · Export this champion · Delete (confirms).
 - ⋮ menu: Import champions · Export all · About / how transfer works.
 - Empty state: one line, one button, plus "Import from Summoner on your computer".
 
 ## Champion screen
 
-A sticky header, the content, and the navigation.
-
 ```
 ┌──────────────────────────┐
-│ ←  Nyxara           ▶  ⋮ │   name and title are tappable to edit
-│    The Hollow Lantern     │   ▶ = Present
+│ ←  Nyxara               ▶│   name and title tappable to edit; ▶ = Present
+│    The Hollow Lantern     │
 ├──────────────────────────┤
 │                          │
-│      (tab content)       │
+│      (tab content)    ◈  │   ◈ = the floating widget
 │                          │
 ├──────────────────────────┤
 │  STORY   IDENTITY  ABILITIES │   bottom bar (first attempt); hides while typing
 └──────────────────────────┘
 ```
 
-Hamburger variant: the bar disappears, ☰ appears at the left of the header and opens a drawer listing Story · Identity · Abilities, with the champion's name and Present at the top.
+Hamburger variant: the bar disappears and ☰ appears at the left of the header, opening a drawer with Story · Identity · Abilities and Present.
 
-⋮ menu: Export this champion · Download poster · Delete.
+### The floating widget
+
+A small gold hex button that floats over the champion screen. It is a menu that stays out of the way until wanted:
+
+- Sits at the screen edge, semi-transparent when idle; **drag it up or down** and it snaps back to the edge and remembers where you left it. It never covers the keyboard's input line.
+- Tap: a compact menu pops out beside it. **Today it has one entry, Journal.** It is deliberately a menu, not a Journal button, so that other features can move in over time (Present, export this champion, the navigation itself in hamburger mode).
+- **Journal** opens a full-screen sheet: a key selector across the top (P Q W E R, starting on the ability you were just looking at), note tabs under it (add, rename, delete), and a large auto-growing text area. Same model as the desktop: notes belong to an ability.
+- It is hidden in Present mode and in the Gallery for now.
 
 ### Story
 
@@ -89,8 +92,8 @@ Hamburger variant: the bar disappears, ☰ appears at the left of the header and
 │ │  [gallery crop frame]│ │
 │ └──────────────────────┘ │
 │ Lore                     │
-│ ┌──────────────────────┐ │
-│ │ Once a lantern keeper│ │   grows with the text
+│ ┌──────────────────────┐ │   grows with the text
+│ │ Once a lantern keeper│ │
 │ └──────────────────────┘ │
 ```
 
@@ -109,52 +112,62 @@ Chips in labelled groups, all multi-select; nothing here needs a sheet.
 │ TAGS     fox · mage · [+ add]            │
 ```
 
-### Abilities
+### Abilities (with parts)
 
-With the numbers gone this is the simplest screen in the app: five keys, and one ability at a time.
+Five keys across the top, one ability at a time. **Parts** are the multi-ability system from the desktop: an extra passive, an alternate form (Gnar's Mega spells, Jayce's cannon and hammer) or a recast (Akali's). A key with parts shows a second, smaller chip row beneath the key strip, so a whole multi-form ability is one tab and a couple of taps.
 
 ```
 │ [P] [Q] [W] [E] [R]      │   key strip; the icon replaces the letter once set
+│ Main · Mega Bolt · Recall · ＋   │   parts row: only what this key has, plus "add part"
 ├──────────────────────────┤
-│ (icon)  LANTERN BOLT     │   tap the icon: Choose image · Remove
-│                          │
-│ Describe what it does... │   grows with the text
-│                          │
+│ (icon) LANTERN BOLT      │   Main: icon, name, description
+│ Describe what it does... │
 ```
 
-It mirrors the desktop's View page: an ability is its icon, name and description. Nothing to scroll past, nothing to configure. The key strip stays put while you type. A filled key shows a small dot so you can see at a glance what's left to write.
+Selecting a part swaps the editor to that part:
 
-## Present (the chrome-free showcase)
+```
+│ Main · [Mega Bolt] · Recall · ＋ │
+│ [Passive] [Alternate form] [Recast]   │   kind chips
+│ NAME   Mega Bolt         │
+│ Bigger, slower...        │   description
+│ WHEN   after Q hits...   │   recast only: the unlock condition
+│              Remove this part │
+```
 
-Present replaces a separate "preview" screen. It is the champion as a card you can hand to a friend: **no header, no bars, no buttons in sight.**
+- The icon belongs to the key (as on the desktop), so it's edited on Main.
+- A part added on the phone has no numbers yet; the desktop fills those in.
+- A key that has content shows a small dot on the strip, so what's left to write is visible at a glance.
 
-- **Immersive.** The Android status and navigation bars hide, and the screen stays awake while it's open. The splash is full-bleed behind a soft gradient.
-- **Pages, not scrolling chrome.** Swipe sideways through three pages; a few faint dots at the bottom show where you are.
-  1. **Cover**: splash, name, title, and the class/lane chips.
+## Present (chrome-free showcase)
+
+The champion as a card you can hand to a friend: **no header, no bars, no buttons in sight.**
+
+- **Immersive.** The Android status and navigation bars hide and the screen stays awake. The splash is full-bleed behind a soft gradient.
+- **Swipe left and right** between three pages. **A page indicator at the bottom** shows where you are: three dots (the current one stretched and gold) and the page's name in small capitals above them (COVER, LORE, ABILITIES).
+  1. **Cover**: splash, name, title, class/lane chips.
   2. **Lore**: the lore, comfortably sized; scrolls if it's long.
-  3. **Abilities**: the row of ability icons with name captions; tap one and its description opens beneath it.
-- **Getting out.** Tap anywhere to show a thin overlay (✕, Share poster); it fades after a moment. Android Back also exits. Nothing else on screen.
+  3. **Abilities**: the row of ability icons with name captions; tap one and its description opens beneath it. A key with parts shows small chips (Main, Mega Bolt, ...) to flip between them.
+- **Getting out.** Tap anywhere to show a thin overlay with a ✕; it fades after a moment. Android Back also exits.
 - Landscape works: the cover uses the wider crop.
-
-This is also the natural place for the poster: Share poster in the overlay renders the desktop's poster layout to an image and opens the Android share sheet (Save to Photos, Drive, messaging).
 
 ## Import and export
 
 - **Export all / this champion** writes a `concept` file (`contract/SPEC.md`) and opens the share sheet: Save to Files, Drive, email, Nearby Share.
-- **Import**: pick a `.json` → the same "here is what will happen" sheet as the desktop: rows for *New / Newer in file / Same / Newer here*, and a Keep mine / Use the file's / Keep both choice for anything that's newer on the phone. Skipped or trimmed items are listed. Nothing is written until you confirm.
+- **Import**: pick a `.json` → the same "here is what will happen" sheet as the desktop: rows for *New / Newer in file / Same / Newer here*, and a Keep mine / Use the file's / Keep both choice for anything newer on the phone. Skipped or trimmed items are listed. Nothing is written until you confirm.
 - Files from the desktop's **Export for mobile** arrive with splash art and icons embedded. Full backups are accepted too; the desktop-only parts are ignored.
-- Later, not in the first slice: tapping a `.json` in Files or an email opens Summoner Mobile straight into the import sheet.
+- Later: tapping a `.json` in Files or an email opens Summoner Mobile straight into the import sheet.
 
 ## Being honest about storage
 
-Champions live in the app's own storage on the phone. **Uninstalling the app, or clearing its data, deletes them.** The ⋮ menu shows "last exported: …", and after a good amount of editing without an export there's one quiet reminder. Android's own backup is enabled for the app's data where the system allows it (a bonus, not a promise).
+Champions live in the app's own storage on the phone. **Uninstalling the app, or clearing its data, deletes them.** The ⋮ menu shows "last exported: ...", and after a good amount of editing without an export there's one quiet reminder. Android's own backup is enabled for the app's data where the system allows it (a bonus, not a promise).
 
 ## Left out on purpose
 
-Everything in the "no" column above, plus Advanced ability mode (roadmap) and the updater screen (the APK is updated by installing the new one; the app can later say "a newer version exists" and link to it).
+Everything in the "no" rows above, the poster image (later), Advanced ability mode (roadmap), and an updater screen (the APK is updated by installing the new one; the app can later say "a newer version exists").
 
-## Open decisions
+## Build plan
 
-1. **Ability blocks and the ability journal.** I've left both off the phone: blocks are a numbers-and-structure feature, and the journal is a design-notes tool the View page doesn't show. They survive untouched on the desktop. Easy to add later without changing the file format. Say if you want either back.
-2. **Present pages.** Swipe sideways through Cover / Lore / Abilities (above), or one long scrolling page? I'd go with swipe: it's the "no clutter" version.
-3. **Poster.** Keep it as a share action from Present and the ⋮ menu (above), or drop it from the first slice?
+1. **Slice 1:** scaffold; storage; gallery and create; Story; Identity; Abilities with parts; the floating widget with Journal; Present; import and export; a debug APK verified on the emulator.
+2. **Slice 2:** polish from real use; poster; open-with-a-`.json`; the hamburger variant of the navigation.
+3. **Ship:** signing key, GitHub release, the QR code and the portfolio page.
