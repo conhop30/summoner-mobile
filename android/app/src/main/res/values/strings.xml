@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Summoner Mobile</string>
-    <string name="title_activity_main">Summoner Mobile</string>
-    <string name="package_name">com.conhop30.summonermobile</string>
-    <string name="custom_url_scheme">com.conhop30.summonermobile</string>
-</resources>

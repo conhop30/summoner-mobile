@@ -1,11 +1,11 @@
-// Android's Back button closes the top-most sheet or menu first, and only then goes up a screen.
+// Back closes the top-most sheet or menu first, and only then goes up a screen.
 // Anything that opens on top of a screen registers a handler here while it is open.
 
 type Handler = () => void
 const stack: Handler[] = []
 
-// The installed web app has no Back button events, only browser history, so the web build hooks in
-// here to give each open sheet a history entry (see webHistory.ts). The Android shell leaves these unset.
+// An installed web app has no Back button events, only browser history, so webHistory.ts hooks in
+// here to give each open sheet a history entry.
 export interface StackHooks {
   pushed: () => void
   released: () => void

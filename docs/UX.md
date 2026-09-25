@@ -8,7 +8,7 @@ The rule for the design: **few screens, short screens, no clutter.** Where somet
 
 - Portrait phone first (360-412 dp wide). One dark theme, the desktop's navy, gold and hextech blue. No light mode.
 - Touch targets at least 44 dp. Nothing below 12 sp. Autosave everything; there is no Save button.
-- Bottom sheets for small pickers, full-screen sheets for the few things that need room (splash repositioning, journal). Android Back closes the top sheet first, then goes up one level.
+- Bottom sheets for small pickers, full-screen sheets for the few things that need room (splash repositioning, journal). Back (the Android gesture or button) closes the top sheet first, then goes up one level.
 - Motion is short CSS transitions. No animation library.
 - **Navigation is swappable.** Story / Identity / Abilities is one component fed by one list of destinations, with two renderers: a **bottom bar** (first attempt) and a **hamburger drawer**. Switching is a one-line change.
 
@@ -143,12 +143,12 @@ Selecting a part swaps the editor to that part:
 
 The champion as a card you can hand to a friend: **no header, no bars, no buttons in sight.**
 
-- **Immersive.** The Android status and navigation bars hide and the screen stays awake. The splash is full-bleed behind a soft gradient.
+- **Immersive.** The browser goes fullscreen (status and navigation bars hide) and the screen stays awake. The splash is full-bleed behind a soft gradient.
 - **Swipe left and right** between three pages. **A page indicator at the bottom** shows where you are: three dots (the current one stretched and gold) and the page's name in small capitals above them (COVER, LORE, ABILITIES).
   1. **Cover**: splash, name, title, class/lane chips.
   2. **Lore**: the lore, comfortably sized; scrolls if it's long.
   3. **Abilities**: the row of ability icons with name captions; tap one and its description opens beneath it. A key with parts shows small chips (Main, Mega Bolt, ...) to flip between them.
-- **Getting out.** Tap anywhere to show a thin overlay with a ✕; it fades after a moment. Android Back also exits.
+- **Getting out.** Tap anywhere to show a thin overlay with a ✕; it fades after a moment. Back (which also leaves fullscreen) exits.
 - Landscape works: the cover uses the wider crop.
 
 ## Import and export
@@ -160,7 +160,7 @@ The champion as a card you can hand to a friend: **no header, no bars, no button
 
 ## Being honest about storage
 
-Champions live in the app's own storage on the phone. **Uninstalling the app, or clearing its data, deletes them.** The ⋮ menu shows "last exported: ...", and after a good amount of editing without an export there's one quiet reminder. Android's own backup is enabled for the app's data where the system allows it (a bonus, not a promise).
+Champions live in the browser's storage for the app, on the device. **Uninstalling the app, or clearing its site data, deletes them.** The About sheet shows "last exported: ...", and after a good amount of editing without an export there's one quiet reminder. The app asks the browser to keep the data when space runs low (`navigator.storage.persist`) and says so in About if that is refused.
 
 ## Left out on purpose
 

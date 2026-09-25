@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import { isNative } from './platform'
 import { initKeyboard } from './platform/keyboard'
 import { initPwa } from './platform/pwa'
 import { installWebHistory } from './platform/webHistory'
@@ -12,7 +11,7 @@ import './styles/screen.css'
 
 initKeyboard()
 initPwa()
-if (!isNative()) installWebHistory()
+installWebHistory()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

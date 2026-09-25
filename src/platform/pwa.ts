@@ -2,7 +2,6 @@
 // the browser to keep the saved champions instead of clearing them when the device runs low on space.
 
 import { create } from 'zustand'
-import { isNative } from './index'
 
 // Chrome's install prompt, held until the user asks for it from the About sheet.
 interface InstallPrompt extends Event {
@@ -39,7 +38,6 @@ export async function promptInstall(): Promise<void> {
 }
 
 export function initPwa(): void {
-  if (isNative()) return
   usePwa.setState({ installed: isStandalone() })
 
   window.addEventListener('beforeinstallprompt', e => {
