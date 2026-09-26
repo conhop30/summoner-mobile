@@ -60,6 +60,8 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 
 `android/app/src/main/java/.../ImmersivePlugin.java` is the one piece of native code: it hides the system bars and keeps the screen awake during Present.
 
+The launcher icon and start-up screen are the Summoner logo (`assets/summoner-logo.png`). After changing the logo, regenerate every size with `powershell -File scripts/android-icons.ps1` (Windows; nothing to install).
+
 ### Releasing
 
 Bump `version` in `package.json`, commit, then tag and push:

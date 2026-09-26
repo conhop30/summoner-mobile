@@ -11,6 +11,8 @@ const config: CapacitorConfig = {
     Keyboard: { resize: KeyboardResize.None },
   },
   android: {
+    // Android 15 and later draw behind the status and navigation bars; this keeps the page clear of them.
+    adjustMarginsForEdgeToEdge: 'auto',
     // Nothing here loads a remote page; keep it that way.
     allowMixedContent: false,
   },
